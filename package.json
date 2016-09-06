@@ -1,0 +1,27 @@
+{
+  "name": "lsmsa-board-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "nodemon -L src --exec babel -w src/ --out-dir build/ --source-maps"
+  },
+  "author": "Connor M. Elsea",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-cli": "^6.14.0",
+    "babel-polyfill": "^6.13.0",
+    "babel-preset-es2015": "^6.14.0",
+    "babel-preset-stage-0": "^6.5.0"
+  },
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "bookshelf": "^0.10.0",
+    "express": "^4.14.0",
+    "jsonwebtoken": "^7.1.9",
+    "knex": "^0.11.10",
+    "morgan": "^1.7.0",
+    "mysql": "^2.11.1"
+  }
+}
