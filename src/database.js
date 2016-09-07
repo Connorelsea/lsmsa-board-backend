@@ -16,5 +16,3 @@ const knexObject      = knex(config)
 const bookshelfObject = bookshelf(knexObject)
 
 export default bookshelfObject
-
-console.log("Hello")

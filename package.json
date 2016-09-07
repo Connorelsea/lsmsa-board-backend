@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "watch": "nodemon -L src --exec babel -w src/ --out-dir build/ --source-maps"
+    "watch": "nodemon -L src --exec babel-node build",
+    "build": "babel -w src/ -d build/ --source-maps",
   },
   "author": "Connor M. Elsea",
   "license": "ISC",
