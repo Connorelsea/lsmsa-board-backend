@@ -8,6 +8,7 @@ exports.up = function(knex, Promise) {
       table.string("name_last")
       table.string("username")
       table.string("password")
+      table.timestamps()
     })
 
   ])
