@@ -7,14 +7,25 @@ function requireFields({
   required,
   success
 }) {
-  let field_values = {}
+  let field_values    = {}
+  let fields_received = []
+  let fields_missing   = []
 
   try {
 
     required.forEach(field => {
-      if (!req.body[field]) throw new Error("First missing field: " + field)
-      else field_values = { ...field_values, [field]:req.body[field] }
+      if (!req.body[field]) {
+        fields_missing.push(field)
+      }
+      else {
+        fields_received.push(field)
+        field_values = { ...field_values, [field]:req.body[field] }
+      }
     })
+
+    if (fields_missing.length > 0) {
+      throw new Error(`Required field(s) missing`)
+    }
 
     success(field_values)
 
@@ -23,7 +34,11 @@ function requireFields({
     res.json({
       error : true,
       data  : {
-        message: `Not all required fields are present: ${err.message}`
+        message: `${err.message}`,
+        fields: {
+          received : fields_received,
+          missing  : fields_missing
+        }
       }
     })
 
