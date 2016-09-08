@@ -1,63 +1,7 @@
 import { Users, User } from "../models.js"
+import { requireFields, respondJSON, respondError } from "../api_util"
 
 const route = "/users"
-
-function requireFields({
-  objects: { req, res },
-  required,
-  success
-}) {
-  let field_values    = {}
-  let fields_received = []
-  let fields_missing   = []
-
-  try {
-
-    required.forEach(field => {
-      if (!req.body[field]) {
-        fields_missing.push(field)
-      }
-      else {
-        fields_received.push(field)
-        field_values = { ...field_values, [field]:req.body[field] }
-      }
-    })
-
-    if (fields_missing.length > 0) {
-      throw new Error(`Required field(s) missing`)
-    }
-
-    success(field_values)
-
-  } catch (err) {
-
-    res.json({
-      error : true,
-      data  : {
-        message: `${err.message}`,
-        fields: {
-          received : fields_received,
-          missing  : fields_missing
-        }
-      }
-    })
-
-  }
-}
-
-function respondError(res, err) {
-  res.status(500).json({
-    error : true,
-    data  : { message: err.message } 
-  })
-}
-
-function respondData(res, data) {
-  res.json({
-    error : false,
-    data  : data
-  })
-}
 
 /**
  * Noun: GET
@@ -65,7 +9,7 @@ function respondData(res, data) {
  */
 function get(req, res) {
   User.findAll()
-  .then(users =>  respondData (res, users.toJSON()))
+  .then(users =>  respondJSON (res, users))
   .catch(err  => respondError (res, err))
 }
 
@@ -82,7 +26,7 @@ function post(req, res) {
     ],
     success: function(fields) {
       User.create(fields)
-        .then(user =>  respondData (res, user.toJSON()))
+        .then(user =>  respondJSON (res, fields, { status: 201 }))
         .catch(err => respondError (res, err))
     }
   })
