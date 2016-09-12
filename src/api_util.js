@@ -9,50 +9,49 @@
  *                             required request body keys
  * @param {function} success - Callback when all keys are found
  */
-function requireFields({
-  objects: { req, res },
-  required,
-  success
-}) {
-  let field_values    = {}
-  let fields_received = []
-  let fields_missing  = []
+function requireFields(required) {
 
-  try {
+  return function(req, res, next) {
 
-    required.forEach(field => {
+    let fields_received = []
+    let fields_missing  = []
 
-      if (!req.body[field]) {
-        fields_missing.push(field)
+    try {
+
+      required.forEach(field => {
+        if (!req.body[field]) fields_missing.push(field)
+        else fields_received.push(field)
+      })
+
+      if (fields_missing.length > 0) {
+        throw new Error(`Required field(s) missing`)
+      } else {
+        next()
       }
 
-      else {
-        fields_received.push(field)
-        field_values = { ...field_values, [field]:req.body[field] }
-      }
+    } catch (err) {
 
-    })
+      res.json({
+        error : true,
+        data  : {
+          message: `${err.message}`,
+          fields: {
+            received : fields_received,
+            missing  : fields_missing
+          }
+        }
+      })
 
-    if (fields_missing.length > 0) {
-      throw new Error(`Required field(s) missing`)
     }
 
-    success(field_values)
-
-  } catch (err) {
-
-    res.json({
-      error : true,
-      data  : {
-        message: `${err.message}`,
-        fields: {
-          received : fields_received,
-          missing  : fields_missing
-        }
-      }
-    })
-
   }
+
+}
+
+function getFields(req, fields) {
+  let values = { }
+  fields.forEach(field => values = { ...values, [field]: req.body[field] } )
+  return values
 }
 
 /**
@@ -80,9 +79,7 @@ function respondError(res, err) {
  * @param {object} data    - Data (formatted as JSON) to be returned
  * @param {object} options - Options altering the intended execution
  */
-function respondJSON(res, data, { status = undefined }) {
-
-  // TODO: idk how to handle passing in a status to this elegantly and optionally
+function respondJSON(res, data, status) {
 
   let response = status ? res.status(status) : res
 
@@ -94,6 +91,7 @@ function respondJSON(res, data, { status = undefined }) {
 
 export {
   requireFields,
+  getFields,
   respondJSON,
   respondError,
 }

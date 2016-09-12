@@ -1,36 +1,36 @@
 import { Users, User } from "../models.js"
-import { requireFields, respondJSON, respondError } from "../api_util"
+import { requireFields, getFields, respondJSON, respondError } from "../api_util"
+import requireAuth from "../utils/auth_middleware"
 
-const route = "/users"
-
-/**
- * Noun: GET
- * Action: Fetch all users
- */
-function get(req, res) {
-  User.findAll()
-  .then(users =>  respondJSON (res, users))
-  .catch(err  => respondError (res, err))
-}
+export const route = "/users"
 
 /**
  * Noun: POST
  * Action: Create new user
  */
-function post(req, res) {
 
-  requireFields({
-    objects  : { req, res },
-    required : [
-      "name_first", "name_last"
-    ],
-    success: function(fields) {
-      User.create(fields)
-        .then(user =>  respondJSON (res, fields, { status: 201 }))
-        .catch(err => respondError (res, err))
-    }
-  })
+export const post_fields = [
+  "name_first", "name_last",
+  "username", "password",
+]
 
+export const post_middleware = [
+  requireFields(post_fields),
+  requireAuth
+]
+
+export const post_action = function(req, res) {
+  User.create(getFields(req, post_fields))
+    .then(user =>  respondJSON (res, user, 201))
+    .catch(err => respondError (res, err))
 }
 
-export { route, post, get }
+/**
+ * Noun: GET
+ * Action: Fetch all users
+ */
+export const get_action = function(req, res) {
+  User.findAll()
+    .then(users =>  respondJSON (res, users))
+    .catch(err  => respondError (res, err))
+}
